@@ -194,6 +194,9 @@ function animate() {
   c.fillStyle = 'rgba(0, 0, 0, 0.1)'
   c.fillRect(0, 0, canvas.width, canvas.height)
   player.update()
+  if (isShooting) {
+    shooting()
+  }
   particles.forEach((particle, index) => {
     if (particle.alpha <= 0) {
       particles.splice(index, 1)
@@ -283,6 +286,41 @@ function animate() {
   })
 }
 
+let mouse = {
+  x: innerWidth / 2,
+  y: innerHeight / 2
+}
+
+// adding projectile to projectiles array
+let isShooting = false
+let shootingDensity = 3
+let count = 20
+const shooting = () => {
+  if (count < 0) {
+    count = 20
+    const angle = Math.atan2(
+      mouse.y - player.y,
+      mouse.x - player.x
+    )
+    
+    const velocity = {
+      x: Math.cos(angle) * 5,
+      y: Math.sin(angle) * 5
+    }
+  
+    projectiles.push(
+      new Projectile(
+        player.x,
+        player.y,
+        5,
+        'white',
+        velocity
+      )
+    )
+  }
+  count -= shootingDensity
+}
+
 function actionByKey(key) {
   const keys = {
     KeyW: 'moveForward',
@@ -305,26 +343,17 @@ addEventListener('keyup', (e) => {
   }
 })
 
-addEventListener('click', (event) => {
-  const angle = Math.atan2(
-    event.clientY - player.y,
-    event.clientX - player.x
-  )
-  
-  const velocity = {
-    x: Math.cos(angle) * 5,
-    y: Math.sin(angle) * 5
-  }
+addEventListener('mousemove', (event) => {
+  mouse.x = event.clientX
+  mouse.y = event.clientY
+})
 
-  projectiles.push(
-    new Projectile(
-      player.x,
-      player.y,
-      5,
-      'white',
-      velocity
-    )
-  )
+addEventListener('mousedown', (event) => {
+  isShooting = true
+})
+
+addEventListener('mouseup', () => {
+  isShooting = false
 })
 
 startGameBtn.addEventListener('click', () => {
