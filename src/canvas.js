@@ -8,6 +8,7 @@ import Enemy from './enemy'
 import Particle from './particle'
 import Projectile from './projectile'
 import SpeedBoost from './speedboost'
+import PointsText from './pointstext'
 
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d')
@@ -41,6 +42,7 @@ let enemies
 let particles
 let score
 let speedBoosts
+let pointsTexts
 
 // event listeners
 addEventListener('keydown', (e) => {
@@ -96,6 +98,7 @@ function init() {
   scoreElement.innerHTML = score
   bigScoreElement.innerHTML = score
   speedBoosts = []
+  pointsTexts = []
 }
 
 function randomXY(radius) {
@@ -218,6 +221,10 @@ function animate() {
           )
         }
         if (enemy.radius - 10 > 5) {
+          // create points text
+          pointsTexts.push(
+            new PointsText(projectile.x, projectile.y, '100')
+          )
           // increase our score
           score += 100
           scoreElement.innerHTML = score
@@ -230,6 +237,10 @@ function animate() {
             projectiles.splice(projectileIndex, 1)
           }, 0)
         } else {
+          // create points text
+          pointsTexts.push(
+            new PointsText(projectile.x, projectile.y, '250')
+          )
           // increase our score
           score += 250
           scoreElement.innerHTML = score
@@ -242,7 +253,7 @@ function animate() {
       }
     })
   })
-  speedBoosts.forEach((speedBoost,index) => {
+  speedBoosts.forEach((speedBoost, index) => {
     speedBoost.update()
 
     const dist = Math.hypot(
@@ -264,6 +275,22 @@ function animate() {
       }, 10000)
 
       speedBoosts.splice(index, 1);
+    }
+    if (speedBoost.x + speedBoost.size < 0 ||
+      speedBoost.x - speedBoost.size > canvas.width ||
+      speedBoost.y + speedBoost.size < 0 ||
+      speedBoost.y - speedBoost.size > canvas.height
+    ) {
+      setTimeout(() => {
+        speedBoosts.splice(index, 1)
+      }, 0)
+    }
+  })
+  pointsTexts.forEach((pointsText, index) => {
+    pointsText.update()
+
+    if (pointsText.alpha <= 0) {
+      pointsTexts.splice(index, 1)
     }
   })
 }
