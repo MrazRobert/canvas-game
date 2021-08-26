@@ -44,6 +44,8 @@ let score
 let speedBoosts
 let pointsTexts
 
+let gameOver = false
+
 // event listeners
 addEventListener('keydown', (e) => {
   if (actionByKey(e.code)) {
@@ -90,6 +92,7 @@ function actionByKey(key) {
 
 // initialize
 function init() {
+  gameOver = false
   player = new Player(canvas.width / 2, canvas.height / 2, 10, 'white')
   projectiles = []
   enemies = []
@@ -159,7 +162,9 @@ function animate() {
   animationId = requestAnimationFrame(animate)
   c.fillStyle = 'rgba(0, 0, 0, 0.1)'
   c.fillRect(0, 0, canvas.width, canvas.height)
-  player.update(movement)
+  if (!gameOver) {
+    player.update(movement)
+  }
   if (isShooting) {
     shooting()
   }
@@ -192,10 +197,35 @@ function animate() {
       player.y - enemy.y
     )
     // end game
-    if (dist - enemy.radius - player.radius < 1) {
-      cancelAnimationFrame(animationId)
-      modalElement.style.display = 'flex'
-      bigScoreElement.innerHTML = score
+    // let end = false
+    if (dist - enemy.radius - player.radius < 1 && !gameOver) {
+      for (let i = 0; i < player.radius * 10; i++) {
+        const hue = utils.randomIntFromRange(30, 60)
+        const light = utils.randomIntFromRange(50, 100)
+        const opacity = 1
+        particles.push(
+          new Particle(
+            player.x,
+            player.y,
+            Math.random() * 2,
+            `hsla(${hue},100%,${light}%,${opacity})`,
+            {
+              x: (Math.random() - 0.5) * (Math.random() * 6),
+              y: (Math.random() - 0.5) * (Math.random() * 6)
+            }
+          )
+        )
+      }
+      if (!gameOver) {
+        gameOver = true
+        player.x = 0
+        player.y = -1000
+        setTimeout(() => {
+          cancelAnimationFrame(animationId)
+          modalElement.style.display = 'flex'
+          bigScoreElement.innerHTML = score
+        }, 3000)
+      }
     }
 
     projectiles.forEach((projectile, projectileIndex) => {
@@ -276,6 +306,7 @@ function animate() {
 
       speedBoosts.splice(index, 1);
     }
+    // remove from edges of screen
     if (speedBoost.x + speedBoost.size < 0 ||
       speedBoost.x - speedBoost.size > canvas.width ||
       speedBoost.y + speedBoost.size < 0 ||
@@ -312,16 +343,18 @@ const shooting = () => {
       x: Math.cos(angle) * 5,
       y: Math.sin(angle) * 5
     }
-  
-    projectiles.push(
-      new Projectile(
-        player.x,
-        player.y,
-        5,
-        projectileColor,
-        velocity
+    
+    if (!gameOver) {
+      projectiles.push(
+        new Projectile(
+          player.x,
+          player.y,
+          5,
+          projectileColor,
+          velocity
+        )
       )
-    )
+    }
   }
   count -= shootingDensity
 }
