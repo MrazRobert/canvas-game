@@ -9,6 +9,7 @@ import Particle from './particle'
 import Projectile from './projectile'
 import SpeedBoost from './speedboost'
 import PointsText from './pointstext'
+import BackgroundPoint from './backgroundpoint'
 
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d')
@@ -45,6 +46,7 @@ let speedBoosts
 let pointsTexts
 
 let gameOver = false
+let haloColor = null
 
 // event listeners
 addEventListener('keydown', (e) => {
@@ -102,6 +104,7 @@ function init() {
   bigScoreElement.innerHTML = score
   speedBoosts = []
   pointsTexts = []
+  createBackground()
 }
 
 function randomXY(radius) {
@@ -162,6 +165,21 @@ function animate() {
   animationId = requestAnimationFrame(animate)
   c.fillStyle = 'rgba(0, 0, 0, 0.1)'
   c.fillRect(0, 0, canvas.width, canvas.height)
+  // background
+  backgroundPoints.forEach(backgroundPoint => {
+    backgroundPoint.update()
+    const dist = Math.hypot(
+      player.x - backgroundPoint.x,
+      player.y - backgroundPoint.y
+    )
+    if (dist <= 80) {
+      backgroundPoint.color = 'rgba(0,0,0,0)'
+    } else if (dist > 80 && dist < 110) {
+        backgroundPoint.color = haloColor
+      } else {
+        backgroundPoint.color = 'rgba(43, 43, 43, 0.2)'
+      }
+  })
   if (!gameOver) {
     player.update(movement)
   }
@@ -220,6 +238,10 @@ function animate() {
         gameOver = true
         player.x = 0
         player.y = -1000
+        haloColor = null
+        backgroundPoints.forEach(backgroundPoint => {
+          backgroundPoint.color = 'rgba(255, 255, 255, 0.5)'
+        })
         setTimeout(() => {
           cancelAnimationFrame(animationId)
           modalElement.style.display = 'flex'
@@ -271,6 +293,7 @@ function animate() {
           pointsTexts.push(
             new PointsText(projectile.x, projectile.y, '250')
           )
+          haloColor = enemy.color
           // increase our score
           score += 250
           scoreElement.innerHTML = score
@@ -357,4 +380,14 @@ const shooting = () => {
     }
   }
   count -= shootingDensity
+}
+
+let backgroundPoints
+function createBackground() {
+  backgroundPoints = []
+  for (let x=0; x<canvas.width; x=x+30) {
+    for (let y=0; y<canvas.height; y=y+30) {
+      backgroundPoints.push(new BackgroundPoint(x, y))
+    }
+  }
 }
