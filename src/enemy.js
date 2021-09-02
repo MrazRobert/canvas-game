@@ -10,7 +10,7 @@ export default class Enemy {
     this.velocity = velocity
     this.radians = 1
     this.motion = motion
-    this.widthOfCirculatrMotion = Math.random() * (5 - 2) + 2
+    this.widthOfCircularMotion = Math.random() * (5 - 2) + 2
   }
 
   draw() {
@@ -37,8 +37,19 @@ export default class Enemy {
     }
 
     if (this.motion === 'circular') {
-      this.x += Math.cos(this.radians) * this.widthOfCirculatrMotion
-      this.y += Math.sin(this.radians) * this.widthOfCirculatrMotion
+      this.x += Math.cos(this.radians) * this.widthOfCircularMotion
+      this.y += Math.sin(this.radians) * this.widthOfCircularMotion
+      this.radians += 0.05
+    }
+    
+    if (this.motion === 'wavy') {
+      const angleInDeg = Math.abs(angle) * 180 / Math.PI
+      if (angleInDeg > 45 && angleInDeg < 135) {
+        this.x += Math.cos(this.radians)
+      }
+      else {
+        this.y += Math.sin(this.radians)
+      }
       this.radians += 0.05
     }
   }

@@ -125,7 +125,7 @@ function spawnEnemies() {
     const radius = Math.random() * (30 - 4) + 4
     const {x, y} = randomXY(radius)
     const color = `hsl(${Math.random() * 360}, 50%, 50%)`
-    const motions = ['straight', 'straight', 'straight', 'circular']
+    const motions = ['straight', 'wavy', 'circular']
     let motion = motions[Math.floor(Math.random() * motions.length)]
 
     const angle = Math.atan2(
