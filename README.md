@@ -10,7 +10,7 @@
 ## Description
 
 <p align="center">
-<img src="./public/image/game.gif" width="80%"></p>
+<img src="./public/image/canvasgame.gif" width="80%"></p>
 
 <p>HTML5 Canvas, JavaScript and Webpack 5</p>
 
